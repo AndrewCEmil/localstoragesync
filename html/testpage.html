@@ -1,0 +1,59 @@
+<html>
+  <body>
+    <script src='jquery-2.1.1.js'></script>
+    <script type='text/javascript'>
+        function rest_get_data() {
+            $.ajax('data').done(function( data ) {
+                //data is an array of objects
+                add_mongo_objects_to_storage(data);
+            });
+        }
+
+        function rest_post_data(data_to_send) {
+            $.ajax({url: '/data',
+                    type: 'POST',
+                    data: {data: data_to_send}}).done(function(data) {
+                        alert("sent!");
+                    });
+        }
+
+        function add_mongo_objects_to_storage(mongo_objects) {
+            for(var i = 0; i < mongo_objects.length; i++) {
+                add_mongo_object_to_storage(mongo_objects[i]);
+            }
+        }
+       
+        function add_mongo_object_to_storage(mongo_object) {
+            localStorage.setItem(JSON.stringify(mongo_object['_id']), JSON.stringify(mongo_object));
+        }
+
+        function get_objects_from_storage() {
+            var localres;
+            var outarr = [];
+            for(key in localStorage) {
+                localres = localStorage.getItem(key);
+                alert(localres);
+                outarr.push(JSON.parse(localres));
+            }
+            return outarr;
+        }
+
+        function testStorage() {
+            localStorage.removeItem('test');
+            rest_get_data();
+
+            testSending();
+        }
+
+        function testSending() {
+            var sendobjs = get_objects_from_storage();
+            alert("going to send");
+            alert(JSON.stringify(sendobjs));
+            rest_post_data(sendobjs);
+        }
+
+        window.onload = testStorage;
+     </script> 
+    <p>Hello world...</p>
+  </body>
+</html>
